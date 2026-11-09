@@ -44,9 +44,10 @@
       flex-direction: column;
       align-items: center;
       padding: 20px;
+      perspective: 1000px; /* 建立 3D 空間感，讓翻頁立體 */
     }
 
-    /* 圖片展示區 */
+    /* 圖片展示區 (加入 3D 轉換屬性) */
     .image-frame {
       width: 100%;
       max-height: 500px;
@@ -56,6 +57,8 @@
       background-color: #fafafa;
       border-radius: 12px;
       overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease, opacity 0.5s ease;
     }
 
     .image-frame img {
@@ -63,6 +66,12 @@
       height: auto;
       max-height: 500px;
       object-fit: contain;
+    }
+
+    /* 翻頁時的動畫樣式類別 */
+    .page-flipping {
+      transform: rotateY(90deg) scale(0.95);
+      opacity: 0.2;
     }
 
     /* 控制列 */
@@ -75,7 +84,7 @@
       gap: 15px;
     }
 
-    /* 圖片按鈕樣式調整 */
+    /* 圖片箭頭按鈕樣式 */
     .arrow-btn {
       background: none;
       border: none;
@@ -87,7 +96,7 @@
     }
 
     .arrow-btn img {
-      width: 70px;     /* 可根據喜好調整按鈕大小 */
+      width: 70px;
       height: auto;
       object-fit: contain;
     }
@@ -145,7 +154,7 @@
 
   <main class="storybook-container">
     <!-- 繪本圖片 -->
-    <div class="image-frame">
+    <div class="image-frame" id="image-frame">
       <img id="page-img" src="assets/graphics/0.jpg" alt="繪本頁面">
     </div>
 
@@ -178,6 +187,7 @@
     let currentPage = 0;
     let isBgmEnabled = true;
 
+    const imageFrame = document.getElementById('image-frame');
     const pageImg = document.getElementById('page-img');
     const pageNum = document.getElementById('page-num');
     const prevBtn = document.getElementById('prev-btn');
@@ -189,18 +199,27 @@
     loadPageMedia();
 
     function changePage(direction) {
-      currentPage += direction;
+      // 觸發翻頁 3D 動態特效
+      imageFrame.classList.add('page-flipping');
 
-      if (currentPage < 0) currentPage = 0;
-      if (currentPage > totalPages) currentPage = totalPages;
+      setTimeout(() => {
+        currentPage += direction;
 
-      pageImg.src = `assets/graphics/${currentPage}.jpg`;
-      pageNum.innerText = `第 ${currentPage} / ${totalPages} 頁`;
+        if (currentPage < 0) currentPage = 0;
+        if (currentPage > totalPages) currentPage = totalPages;
 
-      prevBtn.disabled = (currentPage === 0);
-      nextBtn.disabled = (currentPage === totalPages);
+        // 切換圖片與頁碼
+        pageImg.src = `assets/graphics/${currentPage}.jpg`;
+        pageNum.innerText = `第 ${currentPage} / ${totalPages} 頁`;
 
-      loadPageMedia();
+        prevBtn.disabled = (currentPage === 0);
+        nextBtn.disabled = (currentPage === totalPages);
+
+        loadPageMedia();
+
+        // 移除特效類別，讓圖片轉回正面
+        imageFrame.classList.remove('page-flipping');
+      }, 250); // 配合 0.25 秒的過場時間
     }
 
     function loadPageMedia() {
