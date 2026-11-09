@@ -76,12 +76,6 @@
       flex-wrap: wrap;
     }
 
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
     button {
       background-color: #7b6d5b;
       color: white;
@@ -154,21 +148,22 @@
 
     <!-- 音效與背景音樂控制 -->
     <div class="audio-controls">
-      <button class="audio-btn" id="speech-btn" onclick="playSpeech()">🔊 播放朗讀</button>
-      <button class="audio-btn" id="bgm-btn" onclick="toggleBGM()">🎵 背景音樂：關閉</button>
+      <button class="audio-btn" id="speech-btn" onclick="playSpeech()">🔊 重播朗讀</button>
+      <button class="audio-btn" id="bgm-btn" onclick="toggleBGM()">🎵 背景音樂：開啟</button>
     </div>
   </main>
 
   <!-- 音訊元件 -->
   <audio id="speech-audio"></audio>
-  <audio id="bgm-audio" loop src="assets/music/bgm.mp3"></audio>
+  <audio id="bgm-audio" loop></audio>
 
   <script>
-    // 總頁數（根據圖片 0 ~ 19 設定）
+    // 總頁數（圖片 0 ~ 19）
     const totalPages = 19;
     let currentPage = 0;
+    let isBgmEnabled = true; // 預設開啟背景音樂
 
-    // DOM 元素引用
+    // DOM 元素
     const pageImg = document.getElementById('page-img');
     const pageNum = document.getElementById('page-num');
     const prevBtn = document.getElementById('prev-btn');
@@ -177,39 +172,55 @@
     const bgmAudio = document.getElementById('bgm-audio');
     const bgmBtn = document.getElementById('bgm-btn');
 
+    // 初始化第一頁媒體
+    loadPageMedia();
+
     // 換頁功能
     function changePage(direction) {
       currentPage += direction;
 
-      // 邊界檢查
+      // 邊界限制
       if (currentPage < 0) currentPage = 0;
       if (currentPage > totalPages) currentPage = totalPages;
 
-      // 更新圖片與頁碼
-      // 若你的檔名是 .jpg 請保持 .jpg；若是 .png 可調整副檔名
+      // 更新畫面與按鈕
       pageImg.src = `assets/graphics/${currentPage}.jpg`;
       pageNum.innerText = `第 ${currentPage} / ${totalPages} 頁`;
 
-      // 按鈕啟用 / 停用狀態調整
       prevBtn.disabled = (currentPage === 0);
       nextBtn.disabled = (currentPage === totalPages);
 
-      // 切換頁面時自動播放該頁朗讀
-      playSpeech();
+      // 載入與播放當前頁面的音訊
+      loadPageMedia();
     }
 
-    // 播放語音朗讀
-    function playSpeech() {
-      // 指定該頁音訊路徑
-      speechAudio.src = `assets/speech/${currentPage}.mp3`;
-      speechAudio.play().catch(error => {
-        console.log("自動播放語音受瀏覽器安全性限制，請點擊按鈕播放。");
+    // 載入與播放目前頁面的語音和背景音樂
+    function loadPageMedia() {
+      // 1. 播放當頁語音
+      speechAudio.src = `assets/speech/speech${currentPage}.mp3`;
+      speechAudio.play().catch(() => {
+        console.log("自動播放語音受到瀏覽器限制，請點擊互動後播放。");
       });
+
+      // 2. 播放當頁背景音樂
+      bgmAudio.src = `assets/music/music${currentPage}.mp3`;
+      if (isBgmEnabled) {
+        bgmAudio.play().catch(() => {
+          console.log("自動播放音樂受到瀏覽器限制。");
+        });
+      }
     }
 
-    // 背景音樂開關
+    // 重播語音
+    function playSpeech() {
+      speechAudio.currentTime = 0;
+      speechAudio.play();
+    }
+
+    // 開關背景音樂
     function toggleBGM() {
-      if (bgmAudio.paused) {
+      isBgmEnabled = !isBgmEnabled;
+      if (isBgmEnabled) {
         bgmAudio.play();
         bgmBtn.innerText = "🎵 背景音樂：開啟";
       } else {
