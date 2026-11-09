@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>互動電子繪本</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background-color: #f4efe6;
+      color: #4a3e3d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    header {
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #3a2e2b;
+    }
+
+    /* 繪本主容器 */
+    .storybook-container {
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 800px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* 圖片展示區 */
+    .image-frame {
+      width: 100%;
+      max-height: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fafafa;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .image-frame img {
+      width: 100%;
+      height: auto;
+      max-height: 500px;
+      object-fit: contain;
+    }
+
+    /* 控制列 */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-top: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      background-color: #7b6d5b;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:hover {
+      background-color: #5c5042;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .page-indicator {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #665c54;
+    }
+
+    /* 音訊控制項 */
+    .audio-controls {
+      margin-top: 15px;
+      display: flex;
+      gap: 15px;
+      font-size: 0.95rem;
+    }
+
+    .audio-btn {
+      background-color: #e2d9cc;
+      color: #4a3e3d;
+    }
+
+    .audio-btn:hover {
+      background-color: #d1c4b4;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>電子繪本閱讀器</h1>
+  </header>
+
+  <main class="storybook-container">
+    <!-- 繪本圖片 -->
+    <div class="image-frame">
+      <img id="page-img" src="assets/graphics/0.jpg" alt="繪本頁面">
+    </div>
+
+    <!-- 頁碼與翻頁按鈕 -->
+    <div class="controls">
+      <button id="prev-btn" onclick="changePage(-1)" disabled>◀ 上一頁</button>
+      <span class="page-indicator" id="page-num">第 0 / 19 頁</span>
+      <button id="next-btn" onclick="changePage(1)">下一頁 ▶</button>
+    </div>
+
+    <!-- 音效與背景音樂控制 -->
+    <div class="audio-controls">
+      <button class="audio-btn" id="speech-btn" onclick="playSpeech()">🔊 播放朗讀</button>
+      <button class="audio-btn" id="bgm-btn" onclick="toggleBGM()">🎵 背景音樂：關閉</button>
+    </div>
+  </main>
+
+  <!-- 音訊元件 -->
+  <audio id="speech-audio"></audio>
+  <audio id="bgm-audio" loop src="assets/music/bgm.mp3"></audio>
+
+  <script>
+    // 總頁數（根據圖片 0 ~ 19 設定）
+    const totalPages = 19;
+    let currentPage = 0;
+
+    // DOM 元素引用
+    const pageImg = document.getElementById('page-img');
+    const pageNum = document.getElementById('page-num');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const speechAudio = document.getElementById('speech-audio');
+    const bgmAudio = document.getElementById('bgm-audio');
+    const bgmBtn = document.getElementById('bgm-btn');
+
+    // 換頁功能
+    function changePage(direction) {
+      currentPage += direction;
+
+      // 邊界檢查
+      if (currentPage < 0) currentPage = 0;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      // 更新圖片與頁碼
+      // 若你的檔名是 .jpg 請保持 .jpg；若是 .png 可調整副檔名
+      pageImg.src = `assets/graphics/${currentPage}.jpg`;
+      pageNum.innerText = `第 ${currentPage} / ${totalPages} 頁`;
+
+      // 按鈕啟用 / 停用狀態調整
+      prevBtn.disabled = (currentPage === 0);
+      nextBtn.disabled = (currentPage === totalPages);
+
+      // 切換頁面時自動播放該頁朗讀
+      playSpeech();
+    }
+
+    // 播放語音朗讀
+    function playSpeech() {
+      // 指定該頁音訊路徑
+      speechAudio.src = `assets/speech/${currentPage}.mp3`;
+      speechAudio.play().catch(error => {
+        console.log("自動播放語音受瀏覽器安全性限制，請點擊按鈕播放。");
+      });
+    }
+
+    // 背景音樂開關
+    function toggleBGM() {
+      if (bgmAudio.paused) {
+        bgmAudio.play();
+        bgmBtn.innerText = "🎵 背景音樂：開啟";
+      } else {
+        bgmAudio.pause();
+        bgmBtn.innerText = "🎵 背景音樂：關閉";
+      }
+    }
+  </script>
+</body>
+</html>
