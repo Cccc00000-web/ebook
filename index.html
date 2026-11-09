@@ -13,13 +13,14 @@
 
     body {
       font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-      background-color: #f4efe6;
-      color: #4a3e3d;
+      /* 改為深暗色系背景，提升沈浸感與對比度 */
+      background-color: #1a1816;
+      color: #e6dfd5;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 24px;
     }
 
     header {
@@ -28,50 +29,59 @@
     }
 
     h1 {
-      font-size: 1.8rem;
-      color: #3a2e2b;
+      font-size: 2.1rem;
+      color: #f0e6d2;
+      letter-spacing: 1.5px;
     }
 
-    /* 繪本主容器 */
+    /* 繪本主容器 - 深色主題風格 */
     .storybook-container {
-      background-color: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      background-color: #262320;
+      border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
       width: 100%;
-      max-width: 800px;
+      max-width: 1050px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
-      perspective: 1000px; /* 建立 3D 空間感，讓翻頁立體 */
+      padding: 30px;
+      perspective: 1500px;
+      border: 1px solid #3a3530;
     }
 
-    /* 圖片展示區 (加入 3D 轉換屬性) */
+    /* 圖片展示區 */
     .image-frame {
       width: 100%;
-      max-height: 500px;
+      max-height: 650px;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #fafafa;
-      border-radius: 12px;
+      background-color: #121110;
+      border-radius: 14px;
       overflow: hidden;
       transform-style: preserve-3d;
-      transition: transform 0.5s ease, opacity 0.5s ease;
+      transform-origin: left center;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     .image-frame img {
       width: 100%;
       height: auto;
-      max-height: 500px;
+      max-height: 650px;
       object-fit: contain;
     }
 
-    /* 翻頁時的動畫樣式類別 */
-    .page-flipping {
-      transform: rotateY(90deg) scale(0.95);
-      opacity: 0.2;
+    /* 緩慢的書本翻頁特效 */
+    .flip-next {
+      transform: rotateY(-80deg) translateZ(40px);
+      opacity: 0.05;
+    }
+
+    .flip-prev {
+      transform: rotateY(80deg) translateZ(40px);
+      opacity: 0.05;
     }
 
     /* 控制列 */
@@ -80,11 +90,10 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      margin-top: 20px;
+      margin-top: 24px;
       gap: 15px;
     }
 
-    /* 圖片箭頭按鈕樣式 */
     .arrow-btn {
       background: none;
       border: none;
@@ -92,17 +101,17 @@
       padding: 0;
       display: flex;
       align-items: center;
-      transition: transform 0.1s, opacity 0.2s;
+      transition: transform 0.15s, opacity 0.2s;
     }
 
     .arrow-btn img {
-      width: 70px;
+      width: 75px;
       height: auto;
       object-fit: contain;
     }
 
     .arrow-btn:hover {
-      transform: scale(1.05);
+      transform: scale(1.08);
     }
 
     .arrow-btn:active {
@@ -110,46 +119,86 @@
     }
 
     .arrow-btn:disabled {
-      opacity: 0.3;
+      opacity: 0.2;
       cursor: not-allowed;
       transform: none;
     }
 
     .page-indicator {
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       font-weight: bold;
-      color: #665c54;
+      color: #d1c5b4;
     }
 
-    /* 一般按鈕（語音與背景音樂） */
-    button.audio-btn {
-      background-color: #7b6d5b;
-      color: white;
-      border: none;
-      padding: 10px 18px;
+    /* 語音與音樂操控面板 (深色適應) */
+    .audio-panel {
+      width: 100%;
+      background-color: #1f1c1a;
+      border-radius: 12px;
+      padding: 16px 22px;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid #36312c;
+    }
+
+    .audio-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .audio-title {
       font-size: 1rem;
-      border-radius: 8px;
+      font-weight: bold;
+      color: #d1c5b4;
+      min-width: 95px;
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: #a68a68;
+      cursor: pointer;
+      height: 6px;
+    }
+
+    .time-text {
+      font-size: 0.9rem;
+      color: #a68a68;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .panel-btn {
+      background-color: #a68a68;
+      color: #1a1816;
+      font-weight: bold;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      border-radius: 6px;
       cursor: pointer;
       transition: background-color 0.2s;
     }
 
-    button.audio-btn:hover {
-      background-color: #5c5042;
-    }
-
-    /* 音訊控制項 */
-    .audio-controls {
-      margin-top: 15px;
-      display: flex;
-      gap: 15px;
-      font-size: 0.95rem;
+    .panel-btn:hover {
+      background-color: #c4a783;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>電子繪本閱讀器</h1>
+    <h1>互動電子繪本</h1>
   </header>
 
   <main class="storybook-container">
@@ -158,7 +207,7 @@
       <img id="page-img" src="assets/graphics/0.jpg" alt="繪本頁面">
     </div>
 
-    <!-- 頁碼與圖片箭頭翻頁按鈕 -->
+    <!-- 頁碼與圖片箭頭翻頁 -->
     <div class="controls">
       <button id="prev-btn" class="arrow-btn" onclick="changePage(-1)" disabled>
         <img src="assets/graphics/left.jpg" alt="上一頁">
@@ -171,14 +220,27 @@
       </button>
     </div>
 
-    <!-- 音效與背景音樂控制 -->
-    <div class="audio-controls">
-      <button class="audio-btn" onclick="playSpeech()">🔊 重播朗讀</button>
-      <button class="audio-btn" id="bgm-btn" onclick="toggleBGM()">🎵 背景音樂：開啟</button>
+    <!-- 可操控語音與音樂面板 -->
+    <div class="audio-panel">
+      <!-- 語音朗讀操控列 -->
+      <div class="audio-row">
+        <span class="audio-title">🗣️ 語音朗讀</span>
+        <div class="progress-bar-container">
+          <button class="panel-btn" id="speech-play-btn" onclick="toggleSpeechPlay()">暫停</button>
+          <input type="range" id="speech-progress" value="0" min="0" max="100" step="0.1" oninput="seekSpeech(this.value)">
+          <span class="time-text" id="speech-time">0:00 / 0:00</span>
+        </div>
+      </div>
+
+      <!-- 背景音樂開關列 -->
+      <div class="audio-row">
+        <span class="audio-title">🎵 背景音樂</span>
+        <button class="panel-btn" id="bgm-btn" onclick="toggleBGM()">背景音樂：開啟</button>
+      </div>
     </div>
   </main>
 
-  <!-- 音訊元件 -->
+  <!-- 音訊物件 -->
   <audio id="speech-audio"></audio>
   <audio id="bgm-audio" loop></audio>
 
@@ -192,23 +254,35 @@
     const pageNum = document.getElementById('page-num');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
+
     const speechAudio = document.getElementById('speech-audio');
+    const speechPlayBtn = document.getElementById('speech-play-btn');
+    const speechProgress = document.getElementById('speech-progress');
+    const speechTime = document.getElementById('speech-time');
+
     const bgmAudio = document.getElementById('bgm-audio');
     const bgmBtn = document.getElementById('bgm-btn');
 
     loadPageMedia();
 
+    // 監聽鍵盤方向鍵觸發翻頁
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        if (currentPage > 0) changePage(-1);
+      } else if (event.key === 'ArrowRight') {
+        if (currentPage < totalPages) changePage(1);
+      }
+    });
+
     function changePage(direction) {
-      // 觸發翻頁 3D 動態特效
-      imageFrame.classList.add('page-flipping');
+      const animClass = direction > 0 ? 'flip-next' : 'flip-prev';
+      imageFrame.classList.add(animClass);
 
       setTimeout(() => {
         currentPage += direction;
-
         if (currentPage < 0) currentPage = 0;
         if (currentPage > totalPages) currentPage = totalPages;
 
-        // 切換圖片與頁碼
         pageImg.src = `assets/graphics/${currentPage}.jpg`;
         pageNum.innerText = `第 ${currentPage} / ${totalPages} 頁`;
 
@@ -217,14 +291,17 @@
 
         loadPageMedia();
 
-        // 移除特效類別，讓圖片轉回正面
-        imageFrame.classList.remove('page-flipping');
-      }, 250); // 配合 0.25 秒的過場時間
+        imageFrame.classList.remove('flip-next', 'flip-prev');
+      }, 400);
     }
 
     function loadPageMedia() {
       speechAudio.src = `assets/speech/speech${currentPage}.mp3`;
-      speechAudio.play().catch(() => {});
+      speechAudio.play().then(() => {
+        speechPlayBtn.innerText = "暫停";
+      }).catch(() => {
+        speechPlayBtn.innerText = "播放";
+      });
 
       bgmAudio.src = `assets/music/music${currentPage}.mp3`;
       if (isBgmEnabled) {
@@ -232,19 +309,48 @@
       }
     }
 
-    function playSpeech() {
-      speechAudio.currentTime = 0;
-      speechAudio.play();
+    function toggleSpeechPlay() {
+      if (speechAudio.paused) {
+        speechAudio.play();
+        speechPlayBtn.innerText = "暫停";
+      } else {
+        speechAudio.pause();
+        speechPlayBtn.innerText = "播放";
+      }
+    }
+
+    speechAudio.addEventListener('timeupdate', () => {
+      if (!isNaN(speechAudio.duration)) {
+        const percent = (speechAudio.currentTime / speechAudio.duration) * 100;
+        speechProgress.value = percent;
+        speechTime.innerText = `${formatTime(speechAudio.currentTime)} / ${formatTime(speechAudio.duration)}`;
+      }
+    });
+
+    function seekSpeech(value) {
+      if (!isNaN(speechAudio.duration)) {
+        speechAudio.currentTime = (value / 100) * speechAudio.duration;
+      }
+    }
+
+    speechAudio.addEventListener('ended', () => {
+      speechPlayBtn.innerText = "播放";
+    });
+
+    function formatTime(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = Math.floor(seconds % 60);
+      return `${min}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
     function toggleBGM() {
       isBgmEnabled = !isBgmEnabled;
       if (isBgmEnabled) {
-        bgmAudio.play();
-        bgmBtn.innerText = "🎵 背景音樂：開啟";
+        bgmAudio.play().catch(() => {});
+        bgmBtn.innerText = "背景音樂：開啟";
       } else {
         bgmAudio.pause();
-        bgmBtn.innerText = "🎵 背景音樂：關閉";
+        bgmBtn.innerText = "背景音樂：關閉";
       }
     }
   </script>
