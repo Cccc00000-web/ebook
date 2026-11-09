@@ -13,7 +13,6 @@
 
     body {
       font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-      /* 改為深暗色系背景，提升沈浸感與對比度 */
       background-color: #1a1816;
       color: #e6dfd5;
       display: flex;
@@ -34,7 +33,6 @@
       letter-spacing: 1.5px;
     }
 
-    /* 繪本主容器 - 深色主題風格 */
     .storybook-container {
       background-color: #262320;
       border-radius: 20px;
@@ -50,7 +48,6 @@
       border: 1px solid #3a3530;
     }
 
-    /* 圖片展示區 */
     .image-frame {
       width: 100%;
       max-height: 650px;
@@ -62,7 +59,7 @@
       overflow: hidden;
       transform-style: preserve-3d;
       transform-origin: left center;
-      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
@@ -73,7 +70,6 @@
       object-fit: contain;
     }
 
-    /* 緩慢的書本翻頁特效 */
     .flip-next {
       transform: rotateY(-80deg) translateZ(40px);
       opacity: 0.05;
@@ -84,7 +80,6 @@
       opacity: 0.05;
     }
 
-    /* 控制列 */
     .controls {
       display: flex;
       justify-content: space-between;
@@ -130,7 +125,6 @@
       color: #d1c5b4;
     }
 
-    /* 語音與音樂操控面板 (深色適應) */
     .audio-panel {
       width: 100%;
       background-color: #1f1c1a;
@@ -202,12 +196,10 @@
   </header>
 
   <main class="storybook-container">
-    <!-- 繪本圖片 -->
     <div class="image-frame" id="image-frame">
       <img id="page-img" src="assets/graphics/0.jpg" alt="繪本頁面">
     </div>
 
-    <!-- 頁碼與圖片箭頭翻頁 -->
     <div class="controls">
       <button id="prev-btn" class="arrow-btn" onclick="changePage(-1)" disabled>
         <img src="assets/graphics/left.jpg" alt="上一頁">
@@ -220,9 +212,7 @@
       </button>
     </div>
 
-    <!-- 可操控語音與音樂面板 -->
     <div class="audio-panel">
-      <!-- 語音朗讀操控列 -->
       <div class="audio-row">
         <span class="audio-title">🗣️ 語音朗讀</span>
         <div class="progress-bar-container">
@@ -232,7 +222,6 @@
         </div>
       </div>
 
-      <!-- 背景音樂開關列 -->
       <div class="audio-row">
         <span class="audio-title">🎵 背景音樂</span>
         <button class="panel-btn" id="bgm-btn" onclick="toggleBGM()">背景音樂：開啟</button>
@@ -240,7 +229,6 @@
     </div>
   </main>
 
-  <!-- 音訊物件 -->
   <audio id="speech-audio"></audio>
   <audio id="bgm-audio" loop></audio>
 
@@ -248,6 +236,14 @@
     const totalPages = 19;
     let currentPage = 0;
     let isBgmEnabled = true;
+
+    // 【新增】圖片預先載入快取機制 (Preload)
+    const imagesCache = [];
+    for (let i = 0; i <= totalPages; i++) {
+      const img = new Image();
+      img.src = `assets/graphics/${i}.jpg`;
+      imagesCache.push(img);
+    }
 
     const imageFrame = document.getElementById('image-frame');
     const pageImg = document.getElementById('page-img');
@@ -265,7 +261,6 @@
 
     loadPageMedia();
 
-    // 監聽鍵盤方向鍵觸發翻頁
     document.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowLeft') {
         if (currentPage > 0) changePage(-1);
@@ -278,12 +273,14 @@
       const animClass = direction > 0 ? 'flip-next' : 'flip-prev';
       imageFrame.classList.add(animClass);
 
+      // 縮短動畫時間，讓反應更敏捷
       setTimeout(() => {
         currentPage += direction;
         if (currentPage < 0) currentPage = 0;
         if (currentPage > totalPages) currentPage = totalPages;
 
-        pageImg.src = `assets/graphics/${currentPage}.jpg`;
+        // 直接從快取切換圖片，達到零延遲
+        pageImg.src = imagesCache[currentPage].src;
         pageNum.innerText = `第 ${currentPage} / ${totalPages} 頁`;
 
         prevBtn.disabled = (currentPage === 0);
@@ -292,7 +289,7 @@
         loadPageMedia();
 
         imageFrame.classList.remove('flip-next', 'flip-prev');
-      }, 400);
+      }, 250); // 動畫時間縮短至 0.25 秒
     }
 
     function loadPageMedia() {
